@@ -1,9 +1,11 @@
 import asyncio
 import io
 import json
+import os
 
 import discord
 import matplotlib.pyplot as plt
+import torch
 from doctr.io import DocumentFile
 from doctr.models import ocr_predictor
 from doctr.utils.visualization import visualize_page
@@ -12,8 +14,15 @@ from .utils import compress_to_jpeg, get_image_attachment, to_jpeg_bytes
 
 print("Preparing doctr model...")
 doctr_model = ocr_predictor(pretrained=True)
+if os.environ.get("DOCTR_USE_CPU", "").lower() in ("1", "true", "yes"):
+    device = "CPU"
+elif torch.cuda.is_available():
+    doctr_model = doctr_model.cuda()
+    device = "GPU"
+else:
+    device = "CPU"
 doctr_lock = asyncio.Lock()
-print("doctr model ready.")
+print(f"doctr model ready ({device}).")
 
 
 def run_doctr(image_bytes: bytes) -> tuple[bytes, bytes]:
