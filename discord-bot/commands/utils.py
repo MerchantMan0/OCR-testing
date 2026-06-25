@@ -29,12 +29,31 @@ def compress_to_jpeg(png_bytes: bytes) -> io.BytesIO:
     return buf
 
 
+async def collect_attachments(message) -> list[discord.Attachment]:
+    attachments = list(message.attachments)
+    if message.reference:
+        ref = message.reference.resolved
+        if ref is None:
+            ref = await message.channel.fetch_message(message.reference.message_id)
+        attachments.extend(ref.attachments)
+    return attachments
+
+
+async def read_json_attachment(
+    attachments: list[discord.Attachment], name_hint: str
+) -> bytes | None:
+    for att in attachments:
+        if att.filename.lower().endswith(".json") and name_hint in att.filename.lower():
+            return await att.read()
+    return None
+
+
 async def get_image_attachment(message) -> discord.Attachment | None:
-    attachments = message.attachments
-    if not attachments and message.reference:
-        ref = message.reference.resolved or await message.channel.fetch_message(message.reference.message_id)
-        attachments = ref.attachments
-    if not attachments:
+    attachments = await collect_attachments(message)
+    image = next(
+        (a for a in attachments if a.content_type and a.content_type.startswith("image/")),
+        None,
+    )
+    if image is None:
         await message.channel.send("This command requires an image attachment.")
-        return None
-    return attachments[0]
+    return image
