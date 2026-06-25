@@ -1,6 +1,6 @@
 import cv2
 
-from .json_transform import homography
+from json_transform import homography
 
 
 def warp_to_source(scan, source, target):

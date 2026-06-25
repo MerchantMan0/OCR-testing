@@ -1,8 +1,0 @@
-discord.py>=2.7.1
-matplotlib
-nest-asyncio>=1.6.0
-docscan>=1.0.6
-rembg[gpu]
-python-doctr>=1.0.1
-opencv-python>=4.8.0
-scipy>=1.11.0

@@ -3,7 +3,7 @@ from collections import defaultdict
 import cv2
 import numpy as np
 
-from .common import all_words, block_corners, center, norm_to_px
+from common import all_words, block_corners, center, norm_to_px
 
 
 def matched_pairs(source, target):
