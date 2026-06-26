@@ -20,7 +20,7 @@ _model = None
 def _get_model():
     global _model
     if _model is None:
-        _model = ocr_predictor(pretrained=True)
+        _model = ocr_predictor(pretrained=True).cuda() # remove .cuda() to use CPU
     return _model
 
 
