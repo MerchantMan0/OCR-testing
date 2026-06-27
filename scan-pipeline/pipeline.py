@@ -20,7 +20,7 @@ model = None
 def get_model():
     global model
     if model is None:
-        model = ocr_predictor(pretrained=True).cuda() # remove .cuda() to use CPU. This should be a flag
+        model = ocr_predictor(pretrained=True).cuda() # remove .cuda() to use CPU. TODO This should be a flag
     return model
 
 # OCRs the page.
