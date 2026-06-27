@@ -16,19 +16,19 @@ os.environ.setdefault("U2NET_HOME", str(HERE / ".cache" / "u2net"))
 
 model = None
 
-
+# gets the OCR model.
 def get_model():
     global model
     if model is None:
         model = ocr_predictor(pretrained=True).cuda() # remove .cuda() to use CPU. This should be a flag
     return model
 
-
+# OCRs the page.
 def ocr_page(model, image_bytes: bytes) -> dict:
     doc = DocumentFile.from_images(image_bytes)
     return model(doc).pages[0].export()
 
-
+# processes the document.
 async def process_document(
     source: dict,
     raw_bytes: bytes,
