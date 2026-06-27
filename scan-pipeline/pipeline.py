@@ -14,17 +14,17 @@ from overlay import overlay
 HERE = Path(__file__).parent
 os.environ.setdefault("U2NET_HOME", str(HERE / ".cache" / "u2net"))
 
-_model = None
+model = None
 
 
-def _get_model():
-    global _model
-    if _model is None:
-        _model = ocr_predictor(pretrained=True).cuda() # remove .cuda() to use CPU. This should be a flag
-    return _model
+def get_model():
+    global model
+    if model is None:
+        model = ocr_predictor(pretrained=True).cuda() # remove .cuda() to use CPU. This should be a flag
+    return model
 
 
-def _ocr_page(model, image_bytes: bytes) -> dict:
+def ocr_page(model, image_bytes: bytes) -> dict:
     doc = DocumentFile.from_images(image_bytes)
     return model(doc).pages[0].export()
 
@@ -36,8 +36,8 @@ async def process_document(
     scan_bytes = await asyncio.to_thread(scan, raw_bytes)
     scan_img = cv2.imdecode(np.frombuffer(scan_bytes, np.uint8), cv2.IMREAD_COLOR)
 
-    model = await asyncio.to_thread(_get_model)
-    target = await asyncio.to_thread(_ocr_page, model, scan_bytes)
+    ocr = await asyncio.to_thread(get_model)
+    target = await asyncio.to_thread(ocr_page, ocr, scan_bytes)
 
     flat = warp_to_source(scan_img, source, target)
     return flat, overlay(source, flat)

@@ -5,7 +5,8 @@ import numpy as np
 
 from common import all_words, block_corners, center, norm_to_px
 
-
+# Matches words between source and target by value,
+# returns parallel arrays of x & y coordinates.
 def matched_pairs(source, target):
     by_value = defaultdict(list)
     for w in all_words(target):
@@ -22,6 +23,8 @@ def matched_pairs(source, target):
     return np.float32(src), np.float32(tgt)
 
 
+# Takes two dicts of keypoint data and the scan shape,
+# and returns a homography matrix and inlier mask.
 def homography(source, target, scan_shape):
     h_out, w_out = source["dimensions"]
     src_pts, tgt_pts = matched_pairs(source, target)
@@ -34,10 +37,12 @@ def homography(source, target, scan_shape):
     return matrix, inliers
 
 
+# Estimates a coarse page alignment and returns a 2x3 affine matrix.
 def affine_norm(source, target):
     return cv2.estimateAffinePartial2D(block_corners(source), block_corners(target))
 
 
+# Applies an affine transformation and returns the transformed points.
 def project_affine(points, matrix):
     pts = np.asarray(points, dtype=np.float32).reshape(-1, 1, 2)
     return cv2.transform(pts, matrix).reshape(-1, 2)

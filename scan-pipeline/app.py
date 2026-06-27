@@ -9,23 +9,23 @@ import numpy as np
 from pipeline import process_document
 
 
-def _bgr_to_rgb(image: np.ndarray) -> np.ndarray:
+def bgr_to_rgb(image: np.ndarray) -> np.ndarray:
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
-async def _process(source_file: str, raw: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+async def process_async(source_file: str, raw: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     source = json.loads(Path(source_file).read_text())
     raw_bytes = cv2.imencode(
         ".jpg", cv2.cvtColor(raw, cv2.COLOR_RGB2BGR),
     )[1].tobytes()
     transformed, overlayed = await process_document(source, raw_bytes)
-    return _bgr_to_rgb(transformed), _bgr_to_rgb(overlayed)
+    return bgr_to_rgb(transformed), bgr_to_rgb(overlayed)
 
 
 def process(source_file: str, raw: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     if not source_file or raw is None:
         raise gr.Error("Upload a source JSON and a raw photo.")
-    return asyncio.run(_process(source_file, raw))
+    return asyncio.run(process_async(source_file, raw))
 
 
 with gr.Blocks(title="Scan Pipeline") as demo:

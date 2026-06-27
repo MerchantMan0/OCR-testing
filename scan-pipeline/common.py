@@ -21,7 +21,10 @@ def norm_to_px(pts, hw):
 
 
 def block_corners(page):
-    (x0, y0), (x1, y1) = page["blocks"][0]["geometry"]
+    x0 = min(b["geometry"][0][0] for b in page["blocks"])
+    y0 = min(b["geometry"][0][1] for b in page["blocks"])
+    x1 = max(b["geometry"][1][0] for b in page["blocks"])
+    y1 = max(b["geometry"][1][1] for b in page["blocks"])
     return np.float32([[x0, y0], [x1, y0], [x1, y1], [x0, y1]])
 
 
